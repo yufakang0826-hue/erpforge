@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ERPForge installer for OpenAI Codex
-# Usage: curl -fsSL https://raw.githubusercontent.com/anthropics/erpforge/main/install/codex.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/yufakang0826-hue/erpforge/main/install/codex.sh | bash
 
 set -euo pipefail
 
@@ -18,9 +18,9 @@ fi
 # Clone the repository
 echo "Downloading ERPForge (${ERPFORGE_VERSION})..."
 git clone --depth 1 --branch "$ERPFORGE_VERSION" \
-  https://github.com/anthropics/erpforge.git "$INSTALL_DIR" 2>/dev/null || \
+  https://github.com/yufakang0826-hue/erpforge.git "$INSTALL_DIR" 2>/dev/null || \
 git clone --depth 1 \
-  https://github.com/anthropics/erpforge.git "$INSTALL_DIR"
+  https://github.com/yufakang0826-hue/erpforge.git "$INSTALL_DIR"
 
 # Make scripts executable
 chmod +x "$INSTALL_DIR/scripts/"*.sh

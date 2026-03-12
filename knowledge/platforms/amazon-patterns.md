@@ -2,6 +2,11 @@
 
 > Patterns for integrating with Amazon Selling Partner API (SP-API). Covers dual authentication, core APIs, FBA vs FBM, throttling, and best practices.
 
+> **Community Knowledge** — This file is based on SP-API documentation and community patterns.
+> It has not yet been validated against a production ERP system.
+> Contributions from teams with production Amazon SP-API experience are especially welcome.
+> See [Contributing](#contributing) to help improve this file.
+
 ---
 
 ## 1. Authentication — IAM + LWA Dual Auth

@@ -1,6 +1,8 @@
 # Double-Entry Accounting Model — Cross-Border E-Commerce
 
-> Distilled from production implementation handling multi-currency transactions across eBay, Walmart, Amazon, and MercadoLibre with CNY as functional currency.
+> Distilled from production implementation handling multi-currency transactions across eBay, Walmart, Amazon, and MercadoLibre.
+>
+> **Note on functional currency**: The functional currency is configured during system initialization. Common choices: USD (Americas), EUR (Europe), CNY (China-based sellers), GBP (UK). All transactions are converted to the functional currency for reporting.
 
 ---
 
@@ -72,7 +74,7 @@ CREATE TABLE journal_entries (
   total_debit NUMERIC(19,4) NOT NULL DEFAULT 0,
   total_credit NUMERIC(19,4) NOT NULL DEFAULT 0,
 
-  functional_currency CHAR(3) NOT NULL DEFAULT 'CNY',
+  functional_currency CHAR(3) NOT NULL,  -- Configure at setup: USD, EUR, CNY, GBP, etc.
 
   -- Reversal chain
   reversed_by UUID,
@@ -100,7 +102,7 @@ CREATE TABLE journal_entry_lines (
   credit_amount NUMERIC(19,4) NOT NULL DEFAULT 0,
 
   -- Original currency
-  original_currency CHAR(3) NOT NULL DEFAULT 'CNY',
+  original_currency CHAR(3) NOT NULL,   -- Transaction's original currency
   original_amount NUMERIC(19,4) NOT NULL DEFAULT 0,
   exchange_rate NUMERIC(15,8) NOT NULL DEFAULT 1,
   exchange_rate_date DATE,
@@ -298,7 +300,7 @@ async function createJournalEntry(params: {
 | Concept | Description |
 |---------|-------------|
 | **Transaction currency** | The currency of the original transaction (e.g., USD for eBay US) |
-| **Functional currency** | The company's base reporting currency (e.g., CNY) |
+| **Functional currency** | The company's base reporting currency (configured at setup, e.g., USD, EUR, CNY) |
 | **Exchange rate** | Conversion factor: functional_amount = original_amount × exchange_rate |
 
 ### 5.2 Exchange Rate Timing

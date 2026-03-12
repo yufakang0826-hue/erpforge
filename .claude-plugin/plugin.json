@@ -3,5 +3,20 @@
   "version": "1.0.0",
   "description": "AI-powered skills framework for building cross-border e-commerce ERP systems",
   "author": "ERPForge Contributors",
-  "homepage": "https://github.com/anthropics/erpforge"
+  "homepage": "https://github.com/yufakang0826-hue/erpforge",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yufakang0826-hue/erpforge.git"
+  },
+  "skills": [
+    "skills/using-erpforge.md",
+    "skills/erp-module-design.md",
+    "skills/fullstack-module-build.md",
+    "skills/platform-integration.md",
+    "skills/systematic-debugging.md",
+    "skills/verification-before-completion.md",
+    "skills/quality-polish.md",
+    "skills/test-driven-development.md",
+    "skills/anti-rationalization.md"
+  ]
 }

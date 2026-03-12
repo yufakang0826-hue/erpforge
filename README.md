@@ -37,44 +37,58 @@ Most teams learn these lessons the hard way — through production incidents, da
 
 ### Domain Knowledge
 
-Deep knowledge base covering the domains that make ERP systems hard:
+14 knowledge files across 3 categories, covering the domains that make ERP systems hard:
 
-| Knowledge Area | What It Covers |
+**Domain (5 files)**
+
+| Knowledge File | What It Covers |
 |---------------|----------------|
-| Order Lifecycle | State machine, fulfillment modes, cancellation/refund flows |
-| Accounting | Double-entry bookkeeping, chart of accounts, multi-currency journals |
-| Product Catalog | SPU/SKU hierarchy, platform-specific attributes, listing lifecycle |
-| Logistics & Shipping | Carrier APIs, cost models, tracking, cross-border compliance |
-| Pricing & Costs | Pricing strategies, landed cost, margin calculation |
-| Platform: eBay | Trading API, auth tokens, listing formats, order sync |
-| Platform: Walmart | Marketplace API, partner auth, feed-based listings |
-| Platform: Mercado Libre | REST API, OAuth flow, regional variations |
-| Platform: Amazon | SP-API, role-based auth, catalog integration |
+| `order-lifecycle.md` | Cross-platform order state machine, fulfillment modes, cancellation/refund flows |
+| `accounting-model.md` | Double-entry bookkeeping, multi-currency journals with CNY as functional currency |
+| `product-catalog.md` | SPU/SKU hierarchy, cross-platform attributes, listing lifecycle |
+| `logistics-model.md` | Carrier APIs (YunTu, YanWen, 4PX), platform shipping, cost models, tracking |
+| `pricing-model.md` | Pricing strategies across 28 eBay fee types, landed cost, margin calculation |
+
+**Platforms (5 files)**
+
+| Knowledge File | What It Covers |
+|---------------|----------------|
+| `ebay-patterns.md` | OAuth, `ebay-api` SDK, field mapping, order sync, known quirks |
+| `walmart-patterns.md` | OAuth, Feed API, orders, reports, known quirks |
+| `mercadolibre-patterns.md` | OAuth across 12 site IDs, core APIs, regional variations |
+| `amazon-patterns.md` | SP-API dual authentication, FBA vs FBM, throttling |
+| `platform-abstraction.md` | Multi-platform architecture — the most important platform file |
+
+**Architecture (4 files)**
+
+| Knowledge File | What It Covers |
+|---------------|----------------|
+| `event-driven.md` | BullMQ background job patterns for sync, notifications, reports |
+| `module-boundaries.md` | Module structure, communication patterns, anti-patterns |
+| `multi-tenant.md` | Shared schema + tenant_id + RLS data isolation |
+| `tech-stack.md` | Recommended technology choices with rationale and alternatives |
 
 ### Code Templates
 
-Production-ready scaffolding that encodes architectural decisions:
+5 template groups, each a directory containing multiple production-ready files:
 
-| Template | Generates |
-|----------|-----------|
-| Backend Module | Express routes + Drizzle schema + service layer + validation |
-| Platform Engine | Platform adapter with unified interface + platform-specific impl |
-| List Page | React table page with filters, pagination, and bulk actions |
-| Detail Page | React detail/edit page with form validation and state management |
-| Dashboard Widget | Dashboard card with chart, KPI, or summary data |
+| Template Directory | Files | What It Scaffolds |
+|-------------------|-------|-------------------|
+| `backend/module-scaffold/` | `schema.ts`, `types.ts`, `service.ts`, `routes.ts`, `index.ts` | Complete CRUD module (Express + Drizzle + Zod) with tenant isolation |
+| `backend/platform-engine/` | `base-engine.ts`, `oauth-client.ts`, `api-client.ts`, `field-mapper.ts`, `sync-worker.ts` | Platform integration engine with OAuth, retry, circuit breaker, BullMQ sync |
+| `frontend/list-page/` | `page.tsx`, `columns.tsx`, `filter-bar.tsx`, `use-data.ts` | Data table page with filters, pagination, TanStack Query hooks |
+| `frontend/detail-page/` | `page.tsx`, `form-schema.ts` | Detail/edit page with Zod form validation |
+| `frontend/dashboard-widget/` | `kpi-card.tsx`, `chart-card.tsx` | Dashboard cards for KPI and chart data |
 
 ### Quality Protocols
 
-6 cross-cutting protocols that serve as quality gates:
+3 protocol files defining quality standards:
 
-| Protocol | Enforces |
-|----------|----------|
-| API Contract | REST conventions, error format, pagination, versioning |
-| Database Schema | Migration safety, indexing strategy, RLS policies |
-| UI Consistency | Component standards, spacing, animation, responsive breakpoints |
-| Error Handling | Error boundaries, user messages, structured logging |
-| Security Checklist | Auth, input validation, injection prevention, CORS |
-| Workflow Orchestration | Multi-step coordination, saga patterns, compensation |
+| Protocol File | What It Defines |
+|--------------|-----------------|
+| `quality-gates.md` | 5 quality gates (Compilation, Functional, Security, Two-Phase Review, Deployment) — every deliverable must pass |
+| `cross-cutting-checks.md` | 6 cross-cutting checklists (Context Loading, Design Alignment, Tenant Isolation, Platform Compatibility, Financial Precision, Knowledge Dual-Write) |
+| `workflow-orchestration.md` | 8 workflow types with skill chain sequencing, fallback protocols, and escalation matrix |
 
 ## Quick Start
 
@@ -82,26 +96,26 @@ Production-ready scaffolding that encodes architectural decisions:
 
 ```bash
 # One-line install
-curl -fsSL https://raw.githubusercontent.com/anthropics/erpforge/main/install/claude-code.sh | bash
+curl -fsSL https://raw.githubusercontent.com/yufakang0826-hue/erpforge/main/install/claude-code.sh | bash
 ```
 
 Or manually:
 
 ```bash
-git clone https://github.com/anthropics/erpforge.git ~/.claude/plugins/erpforge
+git clone https://github.com/yufakang0826-hue/erpforge.git ~/.claude/plugins/erpforge
 chmod +x ~/.claude/plugins/erpforge/scripts/*.sh
 ```
 
 ### Cursor
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anthropics/erpforge/main/install/cursor.sh | bash
+curl -fsSL https://raw.githubusercontent.com/yufakang0826-hue/erpforge/main/install/cursor.sh | bash
 ```
 
 ### Codex
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anthropics/erpforge/main/install/codex.sh | bash
+curl -fsSL https://raw.githubusercontent.com/yufakang0826-hue/erpforge/main/install/codex.sh | bash
 ```
 
 ## How It Works
@@ -114,8 +128,8 @@ You: "Add Walmart order sync"
          |
     1. Check skill index
          |---> platform-integration skill loads
-         |---> Reads knowledge/platform-walmart.md
-         |---> Uses templates/platform-engine.md
+         |---> Reads knowledge/platforms/walmart-patterns.md
+         |---> Uses templates/backend/platform-engine/
          |
     2. Design phase (erp-module-design)
          |---> Defines module boundaries
@@ -138,22 +152,46 @@ You: "Add Walmart order sync"
 
 The key insight: **skills compose**. A single task often triggers multiple skills in sequence, each building on the output of the previous one. The `using-erpforge` meta-skill orchestrates this automatically.
 
+## Scaffolding Tool
+
+ERPForge includes a CLI scaffolding tool for quickly generating new modules:
+
+```bash
+# Generate a backend module
+./scripts/scaffold.sh backend my-module
+
+# Generate a platform engine
+./scripts/scaffold.sh platform my-platform
+
+# Generate a frontend list page
+./scripts/scaffold.sh list my-page
+
+# Generate a frontend detail page
+./scripts/scaffold.sh detail my-page
+
+# Generate a dashboard widget
+./scripts/scaffold.sh widget my-widget
+```
+
+The scaffolding tool copies the appropriate template directory, replaces placeholder names with your module name, and sets up the file structure — giving you a production-ready starting point.
+
 ## Project Structure
 
 ```
 erpforge/
 ├── .claude-plugin/
-│   └── plugin.json          # Plugin manifest
+│   └── plugin.json              # Plugin manifest
 ├── hooks/
-│   └── hooks.json           # Session lifecycle hooks
+│   └── hooks.json               # Session lifecycle hooks
 ├── scripts/
-│   └── session-start.sh     # Injects meta-skill on session start
+│   ├── session-start.sh         # Injects meta-skill on session start
+│   └── scaffold.sh              # Module scaffolding tool
 ├── install/
-│   ├── claude-code.sh       # Claude Code installer
-│   ├── cursor.sh            # Cursor installer
-│   └── codex.sh             # Codex installer
+│   ├── claude-code.sh           # Claude Code installer
+│   ├── cursor.sh                # Cursor installer
+│   └── codex.sh                 # Codex installer
 ├── skills/
-│   ├── using-erpforge.md    # Meta-skill (orchestrator)
+│   ├── using-erpforge.md        # Meta-skill (orchestrator)
 │   ├── erp-module-design.md
 │   ├── fullstack-module-build.md
 │   ├── platform-integration.md
@@ -163,27 +201,36 @@ erpforge/
 │   ├── test-driven-development.md
 │   └── anti-rationalization.md
 ├── knowledge/
-│   ├── order-lifecycle.md
-│   ├── accounting-foundations.md
-│   ├── product-catalog.md
-│   ├── logistics-shipping.md
-│   ├── pricing-costs.md
-│   ├── platform-ebay.md
-│   ├── platform-walmart.md
-│   ├── platform-mercadolibre.md
-│   └── platform-amazon.md
+│   ├── README.md
+│   ├── domain/
+│   │   ├── order-lifecycle.md
+│   │   ├── accounting-model.md
+│   │   ├── product-catalog.md
+│   │   ├── logistics-model.md
+│   │   └── pricing-model.md
+│   ├── platforms/
+│   │   ├── platform-abstraction.md
+│   │   ├── ebay-patterns.md
+│   │   ├── walmart-patterns.md
+│   │   ├── mercadolibre-patterns.md
+│   │   └── amazon-patterns.md
+│   └── architecture/
+│       ├── event-driven.md
+│       ├── module-boundaries.md
+│       ├── multi-tenant.md
+│       └── tech-stack.md
 ├── templates/
-│   ├── backend-module.md
-│   ├── platform-engine.md
-│   ├── list-page.md
-│   ├── detail-page.md
-│   └── dashboard-widget.md
+│   ├── README.md
+│   ├── backend/
+│   │   ├── module-scaffold/     # schema.ts, types.ts, service.ts, routes.ts, index.ts
+│   │   └── platform-engine/     # base-engine.ts, oauth-client.ts, api-client.ts, field-mapper.ts, sync-worker.ts
+│   └── frontend/
+│       ├── list-page/           # page.tsx, columns.tsx, filter-bar.tsx, use-data.ts
+│       ├── detail-page/         # page.tsx, form-schema.ts
+│       └── dashboard-widget/    # kpi-card.tsx, chart-card.tsx
 ├── protocols/
-│   ├── api-contract.md
-│   ├── database-schema.md
-│   ├── ui-consistency.md
-│   ├── error-handling.md
-│   ├── security-checklist.md
+│   ├── quality-gates.md
+│   ├── cross-cutting-checks.md
 │   └── workflow-orchestration.md
 ├── package.json
 ├── README.md
