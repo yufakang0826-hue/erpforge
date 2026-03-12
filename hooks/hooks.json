@@ -2,7 +2,8 @@
   "hooks": [
     {
       "event": "SessionStart",
-      "command": "bash scripts/session-start.sh"
+      "command": "bash scripts/session-start.sh",
+      "_comment": "Optional: auto-loads skill index on session start. Remove this hook or set ERPFORGE_MANUAL=1 to load skills on demand instead."
     }
   ]
 }

@@ -2,6 +2,12 @@
 # ERPForge Session Start Hook
 # Reads and outputs the using-erpforge meta-skill on session start
 
+# Skip auto-injection: set ERPFORGE_MANUAL=1
+if [[ "${ERPFORGE_MANUAL:-}" == "1" ]]; then
+  echo "[ERPForge] Manual mode — skills not auto-loaded. Read skills/ directory directly."
+  exit 0
+fi
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

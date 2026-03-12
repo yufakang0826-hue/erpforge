@@ -5,11 +5,15 @@ description: Activates after module functionality is complete — when refining 
 
 # Quality Polish
 
-## <EXTREMELY-IMPORTANT>Iron Law</EXTREMELY-IMPORTANT>
+## Key Principle
 
-**"NOT PERFECT ENOUGH" IS A VALID REASON TO REJECT WORK. EVERY PIXEL, EVERY ANIMATION FRAME, EVERY NUMBER FORMAT MATTERS. THIS IS AN ENTERPRISE SAAS PRODUCT, NOT A PROTOTYPE.**
+**"Not perfect enough" is a valid reason to reject work.** Every pixel, every animation frame, every number format matters. This is an enterprise SaaS product, not a prototype.
 
 Details are not optional. Details are the product.
+
+## Why This Matters for ERP
+
+ERP users (operations staff, warehouse managers, finance teams) spend 8+ hours daily in the system. UI friction that seems minor — a slow table, a confusing status label, an inconsistent filter — compounds into significant productivity loss. When your warehouse manager processes 200 orders per shift, a 2-second delay on each page load costs 6+ minutes per shift. Multiply by a team of 5 and 365 days.
 
 ---
 
@@ -75,7 +79,7 @@ Audit the current state of the module with a critical eye. Score each dimension:
 | L2 — Layout | Component structure, interaction pattern, data layout | Present options, get approval, then execute | Redesign filter bar layout |
 | L3 — System | Design tokens, brand expression, new component patterns | Discuss with user + document decision | New animation system |
 
-### HARD-GATE: Level Classification
+### Checkpoint: Level Classification
 
 Before implementing ANY polish change:
 
@@ -164,7 +168,7 @@ The skeleton flash creates a jarring experience. Maintain visual continuity by k
 
 After implementing polish changes, re-score every dimension:
 
-### HARD-GATE: Score Improvement
+### Checkpoint: Score Improvement
 
 ```
 Re-review score >= Initial score + 1.0
@@ -205,17 +209,17 @@ When polish work establishes a new pattern:
 
 ---
 
-## Anti-Rationalization Defense
+## ERP Delivery Risks
 
-| Agent Says | Reality | Defense |
-|-----------|---------|---------|
-| "It's good enough" | "Good enough" is not the standard | Target is 8+, not "good enough" |
-| "The user won't notice" | Users notice everything — especially business owners | Polish IS the product |
-| "Animation is a nice-to-have" | Animation is core UX, not decoration | Choreograph or don't animate |
-| "I'll polish it later" | Later = never | Polish is Phase 5, not Phase 99 |
-| "This matches the mockup" | Mockups don't capture motion, loading, empty states | Verify the full experience |
+| Risk | What Goes Wrong | Prevention |
+|------|----------------|------------|
+| "Good enough" threshold | Operations staff use this 8 hours/day; friction compounds | Target is 8+, not "good enough" |
+| Ignoring animation choreography | Mismatched animations feel like a prototype, not enterprise SaaS | Choreograph or don't animate |
+| Deferred polish | Polish debt grows faster than code debt; "later" never comes | Polish is Phase 5, not Phase 99 |
+| Mockup-only verification | Mockups don't capture loading states, empty states, or transitions | Verify the full interactive experience |
+| Decimal display errors | Showing "47.0 orders" or "$10.999" erodes trust | Integer stays integer; currency respects precision |
 
-Reference: `skills/anti-rationalization.md` for the complete defense framework.
+Reference: `skills/anti-rationalization.md` for the complete risk catalog.
 
 ---
 

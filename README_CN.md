@@ -118,6 +118,24 @@ curl -fsSL https://raw.githubusercontent.com/yufakang0826-hue/erpforge/main/inst
 curl -fsSL https://raw.githubusercontent.com/yufakang0826-hue/erpforge/main/install/codex.sh | bash
 ```
 
+## 按需取用
+
+ERPForge 是模块化的——用你需要的，跳过不需要的。
+
+### 只要知识库
+把 `knowledge/` 复制到你的项目作为领域参考。不需要技能或插件。
+
+### 只要模板
+用 `scripts/scaffold.sh` 生成模块。可以独立使用。
+
+### 单独使用技能
+`skills/` 里的每个技能都是独立的指南。读一个文件，应用一个模式。
+
+### 关闭自动激活
+```bash
+export ERPFORGE_MANUAL=1  # 技能不会自动加载，按需使用
+```
+
 ## 工作原理
 
 ```

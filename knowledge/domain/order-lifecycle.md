@@ -488,3 +488,19 @@ CREATE TABLE order_workflow_events (
 [ ] 9. Verify amount field precision: platform returns → NUMERIC(19,4) storage
 [ ] 10. Implement return sync (if platform has separate return API)
 ```
+
+---
+
+## Lessons from Production
+
+These lessons come from operating a cross-border ERP handling 150+ orders/day across eBay, Walmart, and Mercado Libre:
+
+- **Don't trust platform order status directly.** eBay's "Completed" doesn't mean "Delivered" — map every platform status to your internal status explicitly. Missing this caused 200+ orders to be marked "completed" before they were even shipped.
+
+- **Hold system saves lives.** Without typed holds (address_hold, payment_hold, fraud_hold), teams use a single boolean `isOnHold` and lose track of WHY orders are stuck. When 50 orders are on hold and you can't tell which need address correction vs. fraud review, operations grinds to a halt.
+
+- **Fulfillment routing breaks at scale.** Hardcoded rules like "if weight < 2kg use carrier A" work for 1 warehouse. When you add a second warehouse, a supplier dropship option, and an overseas fulfillment center, you need a rule engine. Build it before you need it.
+
+- **Multi-platform order deduplication is harder than you think.** Platform order IDs are only unique within a platform. When syncing from 3 platforms to one table, composite keys (platform + platformOrderId) are essential.
+
+- **Cancellation race conditions are real.** A buyer cancels on eBay while your warehouse is printing the label. Without status checks at each step, you ship a cancelled order and eat the return shipping cost.

@@ -5,18 +5,22 @@ description: Activates when any ERP development task begins — module design, p
 
 # ERPForge — AI-Powered Skills Framework
 
-ERPForge is an AI-powered skills framework for building cross-border e-commerce ERP systems. It turns AI agents into experienced ERP architects by providing composable skills, deep domain knowledge, and production-ready templates.
+ERPForge is a toolkit, not a rulebook. Use what helps, skip what doesn't.
+
+It provides composable skills, deep domain knowledge, and production-ready templates for building cross-border e-commerce ERP systems. Think of it as an experienced colleague's playbook — draw from it freely.
 
 ## Core Principles
 
+These principles come from hard-won experience building production ERP systems. We recommend following them because they prevent real problems we've encountered.
+
 ### 1. Module Boundaries + Public API Communication
-Every feature belongs to exactly one module. Modules communicate through well-defined public APIs — never through direct database access or internal imports. This is non-negotiable.
+Every feature belongs to exactly one module. Modules communicate through well-defined public APIs — never through direct database access or internal imports. Experience shows this is the single most impactful architectural decision for long-term maintainability.
 
 ### 2. Platform Engine Pattern
 E-commerce platforms (eBay, Amazon, Walmart, Mercado Libre) each have wildly different APIs, auth flows, rate limits, and data models. The Platform Engine pattern provides a unified abstraction layer: one interface, multiple implementations, zero platform-specific logic leaking into business code.
 
 ### 3. Multi-Tenant Isolation (Shared Schema + RLS + tenantId)
-Every table has a `tenantId` column. Row-Level Security policies enforce isolation at the database level. No query escapes without a tenant filter. No exceptions.
+Every table has a `tenantId` column. Row-Level Security policies enforce isolation at the database level. We strongly recommend ensuring no query escapes without a tenant filter — a single miss can cause a data leak.
 
 ### 4. Domain-Driven Design
 The system is organized around business domains, not technical layers:
@@ -26,23 +30,31 @@ The system is organized around business domains, not technical layers:
 - **Product Catalog** — SPU/SKU hierarchy, platform-specific attributes, listing lifecycle
 
 ### 5. Relentless Quality
-"Not perfect enough" is a valid reason to reject work. Every detail matters — from animation timing to number formatting to error states. This is an enterprise SaaS product, not a prototype.
+Every detail matters — from animation timing to number formatting to error states. This is an enterprise SaaS product, not a prototype.
 
 ---
 
-## <EXTREMELY-IMPORTANT>Skill-First Principle</EXTREMELY-IMPORTANT>
+## Recommended Skill Combinations
 
-**Before executing ANY task, you MUST check if an applicable skill exists.**
+Pick the combination that fits your task. Each skill can also be used independently (see "A La Carte" below).
 
-This is not a suggestion. This is a hard requirement. Even if there is only a 1% chance a skill applies, check the index below. Skills encode hard-won lessons from building production ERP systems — skipping them means repeating mistakes that have already been solved.
+| Task Type | Recommended Skills | Why This Combination |
+|-----------|-------------------|---------------------|
+| **New module** | `erp-module-design` → `fullstack-module-build` → `verification-before-completion` | Design first prevents rework; verification catches gaps |
+| **Bug fix** | `systematic-debugging` → `verification-before-completion` | Methodical diagnosis beats guessing; verify the fix actually works |
+| **Platform integration** | `platform-integration` → `verification-before-completion` | Platform APIs have many quirks; verification ensures completeness |
+| **Quality polish** | `quality-polish` → `verification-before-completion` | Polish to enterprise standard, then verify nothing regressed |
+| **Full cycle** | `erp-module-design` → `fullstack-module-build` → `quality-polish` → `verification-before-completion` | The complete journey from concept to polished delivery |
 
-The check takes 5 seconds. The cost of skipping it can be days of rework.
+## A La Carte
+
+Every skill is a self-contained guide. You can read one file and apply one pattern — no need to adopt the full framework.
 
 ---
 
 ## Available Skills Index
 
-Check each skill's trigger condition. If your current task matches, read and follow that skill **before writing any code**.
+Check each skill's trigger condition. If your current task matches, the corresponding skill likely has useful guidance.
 
 | Skill | File | Trigger Condition |
 |-------|------|-------------------|
@@ -100,17 +112,19 @@ Cross-cutting quality checks that apply to all work. These are referenced by ski
 | **UI Consistency** | `protocols/ui-consistency.md` | Component usage, spacing, animation, responsive |
 | **Error Handling** | `protocols/error-handling.md` | Error boundaries, user-facing messages, logging |
 | **Security Checklist** | `protocols/security-checklist.md` | Auth, input validation, injection prevention |
-| **Workflow Orchestration** | `protocols/workflow-orchestration.md` | Multi-step task coordination, state management |
+| **Workflow Patterns** | `protocols/workflow-orchestration.md` | Recommended workflow patterns and checkpoints |
 
 ---
 
 ## How Skills Work Together
 
+A typical flow — adapt to your situation:
+
 ```
 User Request
     |
     v
-[Check using-erpforge skill index]
+[Browse skill index for relevant guidance]
     |
     +--> Design phase?     --> erp-module-design
     |                           |
@@ -130,7 +144,7 @@ User Request
     +--> Polish needed?    --> quality-polish
     |
     +--> All phases:       --> test-driven-development (parallel)
-    |                      --> anti-rationalization (always active)
+    |                      --> anti-rationalization (always helpful)
     |
     v
 [Read relevant knowledge/ files for domain context]
@@ -139,12 +153,12 @@ User Request
 [Use templates/ for scaffolding when creating new components]
     |
     v
-[Apply protocols/ as quality gates before declaring done]
+[Apply protocols/ as quality checks before declaring done]
 ```
 
 ---
 
-## <EXTREMELY-IMPORTANT>Priority Order</EXTREMELY-IMPORTANT>
+## Priority Order
 
 1. **User instructions** — Always take precedence over everything else
 2. **ERPForge skills** — Follow the applicable skill's methodology

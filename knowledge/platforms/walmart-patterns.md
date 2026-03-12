@@ -250,3 +250,13 @@ interface WalmartError {
 | US | `marketplace.walmartapis.com` | USD |
 | Canada | `marketplace.walmartapis.ca` | CAD |
 | Mexico | `marketplace.walmartapis.com.mx` | MXN |
+
+---
+
+## Lessons from Production
+
+- **Feed processing is eventually consistent.** After submitting a feed, the status API may show "processing" for minutes to hours. Don't retry submissions during this window — you'll create duplicates.
+
+- **Settlement reports are ZIP files, not JSON.** This catches every team that reads the docs too quickly. The financial reconciliation endpoint returns a ZIP containing CSV files, not a JSON response.
+
+- **Multi-marketplace means multi-everything.** US, Canada, and Mexico have different category trees, different required attributes, and different fee structures. Code that works for Walmart US will NOT work for Walmart CA without changes.

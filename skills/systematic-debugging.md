@@ -5,11 +5,15 @@ description: Activates when encountering any bug, test failure, unexpected behav
 
 # Systematic Debugging
 
-## <EXTREMELY-IMPORTANT>Iron Law</EXTREMELY-IMPORTANT>
+## Key Principle
 
-**NO FIX SHALL BE ATTEMPTED WITHOUT FIRST REPRODUCING THE BUG AND LOCATING THE ROOT CAUSE TO A SPECIFIC FILE AND LINE NUMBER.**
+**No fix without first reproducing the bug and locating the root cause to a specific file and line number.**
 
 Guessing is not debugging. Changing code without understanding why it's broken creates more bugs than it fixes.
+
+## Why This Matters for ERP
+
+In a multi-platform ERP, a blind fix to an eBay sync bug can break Walmart sync. The reproduce→locate→fix→verify approach prevents cascading failures across platforms. When your order service handles 3 platforms, 5 fulfillment modes, and 11 order states, intuition-based fixes are a recipe for whack-a-mole debugging.
 
 ---
 
@@ -25,10 +29,10 @@ digraph debugging {
     stage3 [label="Stage 3: FIX\nMinimal change\nto root cause" fillcolor="#fff3e0"]
     stage4 [label="Stage 4: VERIFY\nOriginal bug gone\n+ no regressions" fillcolor="#f3e5f5"]
 
-    gate1 [label="HARD-GATE\nCan reproduce\nconsistently?" shape=diamond fillcolor="#ffcdd2"]
-    gate2 [label="HARD-GATE\nRoot cause at\nspecific line?" shape=diamond fillcolor="#ffcdd2"]
-    gate3 [label="HARD-GATE\n3 attempts\nexhausted?" shape=diamond fillcolor="#ffcdd2"]
-    gate4 [label="HARD-GATE\nOriginal bug fixed\n+ tests pass?" shape=diamond fillcolor="#ffcdd2"]
+    gate1 [label="Checkpoint\nCan reproduce\nconsistently?" shape=diamond fillcolor="#ffcdd2"]
+    gate2 [label="Checkpoint\nRoot cause at\nspecific line?" shape=diamond fillcolor="#ffcdd2"]
+    gate3 [label="Checkpoint\n3 attempts\nexhausted?" shape=diamond fillcolor="#ffcdd2"]
+    gate4 [label="Checkpoint\nOriginal bug fixed\n+ tests pass?" shape=diamond fillcolor="#ffcdd2"]
     escalate [label="ESCALATE\nto User" fillcolor="#ff8a80" style=filled]
     done [label="DONE" fillcolor="#a5d6a7" style=filled]
 
@@ -63,7 +67,7 @@ digraph debugging {
 - [ ] Environment details (browser, Node version, OS)
 - [ ] Frequency: always / sometimes / once
 
-### HARD-GATE: Reproduction Verified
+### Checkpoint: Reproduction Verified
 
 The bug must be triggered at least once with your documented steps before proceeding. If you cannot reproduce it:
 
@@ -131,7 +135,7 @@ When the bug involves a platform API:
 3. **Compare**: Does raw response match what your code processes?
 4. **Document**: If it's a platform quirk, add it to the quirks file
 
-### HARD-GATE: Root Cause Located
+### Checkpoint: Root Cause Located
 
 Before proceeding to fix, you must state:
 
@@ -202,18 +206,18 @@ When escalating, provide:
 
 ---
 
-## Anti-Rationalization Defense
+## ERP Delivery Risks
 
-| # | Agent Says | Reality | Defense |
-|---|-----------|---------|---------|
-| 1 | "I know where the bug is" | Without reproduction, you're guessing | Stage 1 is mandatory — reproduce first |
-| 2 | "Let me just fix it and see" | Blind fixes create more bugs | Stage 2 is mandatory — locate root cause |
-| 3 | "Works in test environment" | Production conditions differ | Verify with production-like data/config |
-| 4 | "Changing one line can't break anything" | `npm test` is the judge, not intuition | Run full test suite after every change |
-| 5 | "A restart fixed it" | Root cause is still there, will recur | Restart is not a fix — find the cause |
-| 6 | "It's the third-party API's fault" | Eliminate your code first | Make raw API request to verify |
+| # | Risk | What Goes Wrong | Prevention |
+|---|------|----------------|------------|
+| 1 | Guessing the root cause | Without reproduction, fixes are random | Stage 1 is mandatory — reproduce first |
+| 2 | Blind fix attempts | Changing code without understanding creates more bugs | Stage 2 is mandatory — locate root cause |
+| 3 | Only testing in dev environment | Production data, load, and timing differ | Verify with production-like data/config |
+| 4 | "One line can't break anything" | Cross-module dependencies are invisible | Run full test suite after every change |
+| 5 | Restart as a fix | Root cause persists; the crash will recur at 2 AM | Restart buys time — still find the cause |
+| 6 | Blaming the platform API | Your mapping/retry logic might be the real problem | Make raw API request to verify |
 
-Reference: `skills/anti-rationalization.md` for the complete defense framework.
+Reference: `skills/anti-rationalization.md` for the complete risk catalog.
 
 ---
 

@@ -7,18 +7,22 @@ description: Five quality gates that every deliverable must pass — compilation
 
 ## Overview
 
-Every deliverable passes through up to 5 quality gates. Gates are checkpoints — work cannot proceed until the gate's criteria are met. HARD-GATEs are mandatory and cannot be skipped under any circumstances.
+Every deliverable passes through up to 5 quality gates. Gates are verification checkpoints that catch issues before they reach production.
+
+### Lightweight Option
+
+If your team has limited bandwidth, focus on Gate 1 (compilation) and Gate 2 (functional verification). These two catch 80% of issues.
 
 ```dot
 digraph quality_gates {
     rankdir=LR
     node [shape=box, style="rounded,filled", fillcolor="#f0f0f0"]
 
-    qg1 [label="QG-1\nCompilation\n(HARD-GATE)" fillcolor="#ffcdd2"]
-    qg2 [label="QG-2\nFunctional\n(HARD-GATE)" fillcolor="#ffcdd2"]
+    qg1 [label="QG-1\nCompilation" fillcolor="#ffcdd2"]
+    qg2 [label="QG-2\nFunctional" fillcolor="#ffcdd2"]
     qg3 [label="QG-3\nSecurity\n(Conditional)" fillcolor="#fff3e0"]
     qg4 [label="QG-4\nTwo-Phase\nReview" fillcolor="#e3f2fd"]
-    qg5 [label="QG-5\nDeployment\n(HARD-GATE)" fillcolor="#ffcdd2"]
+    qg5 [label="QG-5\nDeployment" fillcolor="#ffcdd2"]
 
     qg1 -> qg2 -> qg3 -> qg4 -> qg5
 }
@@ -26,7 +30,7 @@ digraph quality_gates {
 
 ---
 
-## QG-1: Compilation Gate (HARD-GATE)
+## QG-1: Compilation Gate
 
 **Purpose:** Ensure code is syntactically and type-safe before any functional testing.
 
@@ -45,13 +49,13 @@ digraph quality_gates {
 - **Pass:** All 5 checks return zero matches / zero errors → Proceed to QG-2
 - **Fail:** Any check fails → Fix before proceeding. No exceptions.
 
-### Why This Is a HARD-GATE
+### Why This Is a Gate
 
 `as any` and `@ts-ignore` defeat the purpose of TypeScript. They are band-aids that hide bugs. If a type doesn't fit, fix the type — don't silence the compiler.
 
 ---
 
-## QG-2: Functional Verification Gate (HARD-GATE)
+## QG-2: Functional Verification Gate
 
 **Purpose:** Prove that the code actually works, not just compiles.
 
@@ -75,7 +79,7 @@ digraph quality_gates {
 
 Evidence must be from AFTER the latest code change. Stale evidence is not evidence.
 
-### Why This Is a HARD-GATE
+### Why This Is a Gate
 
 Reference: `skills/anti-rationalization.md` AR-2 — "tsc passes, feature complete" is the most common rationalization. Compilation proves syntax. Only functional testing proves behavior.
 
@@ -151,7 +155,7 @@ If none of these apply, skip to QG-4.
 
 ---
 
-## QG-5: Deployment Gate (HARD-GATE)
+## QG-5: Deployment Gate
 
 **Purpose:** Ensure the deliverable is safe to deploy to production.
 
@@ -171,7 +175,7 @@ If none of these apply, skip to QG-4.
 - **Pass:** All 6 checks pass with evidence → Ready for deployment
 - **Fail:** Any check fails → Fix before deploying. No "deploy and fix in production."
 
-### Why This Is a HARD-GATE
+### Why This Is a Gate
 
 A failed deployment affects all users, all tenants, and potentially all platforms. The cost of a bad deployment is orders of magnitude higher than the cost of verifying before deploying.
 
@@ -211,12 +215,12 @@ digraph gate_failure {
 
 | Gate | Type | When | Key Question |
 |------|------|------|-------------|
-| QG-1 | HARD-GATE | After code changes | Does it compile cleanly? |
-| QG-2 | HARD-GATE | After QG-1 | Does it actually work? |
+| QG-1 | Required | After code changes | Does it compile cleanly? |
+| QG-2 | Required | After QG-1 | Does it actually work? |
 | QG-3 | Conditional | Security-related changes | Is it secure? |
-| QG-4 | Always | Before delivery | Is it complete and well-built? |
-| QG-5 | HARD-GATE | Before deployment | Is it safe to deploy? |
+| QG-4 | Recommended | Before delivery | Is it complete and well-built? |
+| QG-5 | Required | Before deployment | Is it safe to deploy? |
 
 ---
 
-*Quality gates are not bureaucracy. They are the minimum standard for professional software delivery.*
+*Quality gates exist because ERP bugs have real consequences — wrong shipments, data leaks, financial discrepancies. They're not overhead; they're insurance.*

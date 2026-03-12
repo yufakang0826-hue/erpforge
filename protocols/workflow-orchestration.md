@@ -1,285 +1,230 @@
 ---
 name: workflow-orchestration
-description: Defines the 8 workflow types, their triggers, sequencing, fallback protocols, and escalation matrix for multi-step ERP development tasks
+description: Reference guide for workflow patterns — common skill combinations, phase checkpoints, and recovery strategies for multi-step ERP development tasks
 ---
 
-# Workflow Orchestration Protocol
+# Workflow Patterns — Reference Guide
 
 ## Overview
 
-Every ERP development task follows one of 8 workflow types. Each workflow chains specific skills in a defined sequence. This protocol governs how workflows start, chain, recover from failure, and escalate.
+This document describes common workflow patterns for ERP development tasks. Each pattern is a proven approach — adopt what fits your situation, adapt what doesn't, skip what's not relevant.
 
 ---
 
-## The 8 Workflow Types
+## Workflow Patterns
 
-| # | Workflow | Trigger | Primary Skill Chain |
-|---|---------|---------|-------------------|
-| 1 | **Module Design** | "Design a new module/feature/entity" | `erp-module-design` |
-| 2 | **Module Build** | "Build/implement {approved design}" | `fullstack-module-build` → `quality-polish` |
-| 3 | **Platform Integration** | "Integrate {platform} API" | `platform-integration` → `quality-polish` |
-| 4 | **Bug Fix** | "Fix {bug/error/issue}" | `systematic-debugging` → `verification-before-completion` |
-| 5 | **Quality Polish** | "Polish/refine/improve UI of {module}" | `quality-polish` |
-| 6 | **Test Development** | "Add tests for {module/feature}" | `test-driven-development` |
-| 7 | **Full Cycle** | "Design and build {module}" | `erp-module-design` → `fullstack-module-build` → `quality-polish` |
-| 8 | **Hotfix** | "Critical production issue" | `systematic-debugging` → `verification-before-completion` (expedited) |
+| # | Pattern | When It Applies | Skill Combination |
+|---|---------|----------------|-------------------|
+| 1 | **Module Design** | Designing a new module, feature, or entity | `erp-module-design` |
+| 2 | **Module Build** | Implementing an approved design | `fullstack-module-build` → `quality-polish` |
+| 3 | **Platform Integration** | Integrating a platform API | `platform-integration` → `quality-polish` |
+| 4 | **Bug Fix** | Fixing a bug or error | `systematic-debugging` → `verification-before-completion` |
+| 5 | **Quality Polish** | Refining a functionally complete module | `quality-polish` |
+| 6 | **Test Development** | Adding tests for a module or feature | `test-driven-development` |
+| 7 | **Full Cycle** | Design and build from scratch | `erp-module-design` → `fullstack-module-build` → `quality-polish` |
+| 8 | **Hotfix** | Critical production issue | `systematic-debugging` → `verification-before-completion` (expedited) |
 
-### Workflow Selection
+### Choosing a Pattern
 
-```dot
-digraph workflow_selection {
-    rankdir=TB
-    node [shape=box, style="rounded,filled", fillcolor="#f0f0f0"]
-
-    start [label="User Request" shape=ellipse]
-    q1 [label="Design exists?" shape=diamond fillcolor="#e3f2fd"]
-    q2 [label="What type of work?" shape=diamond fillcolor="#e3f2fd"]
-    q3 [label="Production\ncritical?" shape=diamond fillcolor="#e3f2fd"]
-
-    wf1 [label="WF-1\nModule Design" fillcolor="#e8f5e9"]
-    wf2 [label="WF-2\nModule Build" fillcolor="#e8f5e9"]
-    wf3 [label="WF-3\nPlatform Integration" fillcolor="#e8f5e9"]
-    wf4 [label="WF-4\nBug Fix" fillcolor="#e8f5e9"]
-    wf5 [label="WF-5\nQuality Polish" fillcolor="#e8f5e9"]
-    wf6 [label="WF-6\nTest Development" fillcolor="#e8f5e9"]
-    wf7 [label="WF-7\nFull Cycle" fillcolor="#fff3e0"]
-    wf8 [label="WF-8\nHotfix" fillcolor="#ffcdd2"]
-
-    start -> q1
-    q1 -> q2 [label="Yes"]
-    q1 -> wf1 [label="No — design first"]
-    q2 -> wf2 [label="Build"]
-    q2 -> wf3 [label="Platform"]
-    q2 -> wf5 [label="Polish"]
-    q2 -> wf6 [label="Tests"]
-    q2 -> q3 [label="Bug"]
-    q3 -> wf8 [label="Yes — critical"]
-    q3 -> wf4 [label="No — normal"]
-
-    wf1 -> wf2 [label="Design approved →" style=dashed]
-    wf2 -> wf5 [label="Build complete →" style=dashed]
-}
+```
+User Request
+    |
+    +--> Need design first?        --> Pattern 1: Module Design
+    |
+    +--> Design approved, build?   --> Pattern 2: Module Build
+    |
+    +--> Platform API work?        --> Pattern 3: Platform Integration
+    |
+    +--> Bug or error?
+    |     +--> Critical?           --> Pattern 8: Hotfix
+    |     +--> Normal              --> Pattern 4: Bug Fix
+    |
+    +--> Polish existing module?   --> Pattern 5: Quality Polish
+    |
+    +--> Need tests?               --> Pattern 6: Test Development
+    |
+    +--> Design + build together?  --> Pattern 7: Full Cycle
 ```
 
 ---
 
-## Workflow State Machine
+## Phase Depth Options
 
-Every workflow instance transitions through these states:
+Not every task needs the same level of ceremony. Choose the depth that fits:
 
-```dot
-digraph workflow_states {
-    rankdir=LR
-    node [shape=circle, style=filled, fillcolor="#f0f0f0"]
+### Full (5 Phases)
+Best for: New modules, complex features, platform integrations
 
-    created [fillcolor="#e3f2fd"]
-    planning [fillcolor="#fff3e0"]
-    in_progress [fillcolor="#e8f5e9"]
-    qa_review [fillcolor="#fce4ec"]
-    completed [fillcolor="#a5d6a7"]
-    rework [fillcolor="#ffcdd2"]
-    escalated [fillcolor="#ff8a80"]
-
-    created -> planning [label="start"]
-    planning -> in_progress [label="plan approved"]
-    in_progress -> qa_review [label="implementation done"]
-    qa_review -> completed [label="all gates pass"]
-    qa_review -> rework [label="gate fails"]
-    rework -> in_progress [label="fix applied"]
-    rework -> escalated [label="3 attempts failed"]
-    in_progress -> escalated [label="blocked"]
-    escalated -> in_progress [label="user unblocks"]
-}
+```
+Design → Backend → Frontend → Test → Deliver
 ```
 
-### State Definitions
+Each phase has a checkpoint before moving to the next. This gives the most structure and catches issues early.
 
-| State | Description | Allowed Actions |
-|-------|-------------|----------------|
-| `created` | Workflow initialized, not yet started | Start planning |
-| `planning` | Loading context, identifying skills, creating plan | Approve plan, modify plan |
-| `in_progress` | Actively implementing the current phase | Continue, flag blocker |
-| `qa_review` | Running quality gates (QG-1 through QG-5) | Pass gate, fail gate |
-| `completed` | All gates passed, deliverable ready | Archive, start next workflow |
-| `rework` | A gate failed, fixing issues | Apply fix, escalate |
-| `escalated` | Blocked or 3+ rework attempts, needs user input | User resolves |
+### Lite (3 Phases)
+Best for: Medium features, enhancements, most bug fixes
+
+```
+Design → Implement → Verify
+```
+
+Combines backend and frontend into one implementation phase. Still validates design upfront and verifies at the end.
+
+### Minimal
+Best for: Small fixes, configuration changes, simple tweaks
+
+```
+Just verify before declaring done
+```
+
+When the change is straightforward, the main value is making sure it actually works.
 
 ---
 
-## Skill Chain Sequencing
+## Skill Chaining
 
 ### Sequential Chains
 
-Some workflows chain skills in strict sequence:
+Some patterns benefit from chaining skills in sequence:
 
 ```
-WF-2 Module Build:
+Pattern 2 — Module Build:
   fullstack-module-build (Phase 1-5)
-    → quality-gates (QG-1 through QG-5)
-    → quality-polish (if user requests)
+    → quality-polish (if refinement needed)
     → verification-before-completion
 
-WF-3 Platform Integration:
+Pattern 3 — Platform Integration:
   platform-integration (Phase 1-5)
-    → quality-gates (QG-1 through QG-5)
-    → quality-polish (if user requests)
+    → quality-polish (if refinement needed)
     → verification-before-completion
 
-WF-7 Full Cycle:
+Pattern 7 — Full Cycle:
   erp-module-design
-    → [USER APPROVAL GATE]
+    → [User reviews and approves design]
     → fullstack-module-build
-    → quality-gates
     → quality-polish
     → verification-before-completion
 ```
 
 ### Parallel Skills
 
-Some skills run in parallel with all workflows:
+These skills add value alongside any workflow:
 
-- `test-driven-development` — Active during any implementation phase
-- `anti-rationalization` — Active at all times, referenced by all skills
+- `test-driven-development` — Helpful during any implementation phase
+- `anti-rationalization` — A useful gut-check against cutting corners
 
 ### Cross-Cutting Checks
 
-At specific points in every workflow:
+Useful checkpoints to consider during any workflow:
 
-| Point | Cross-Cutting Check |
-|-------|-------------------|
-| Workflow start | CC-1 Context Loading |
-| Any design decision | CC-2 Design Alignment |
-| Any data access code | CC-3 Tenant Isolation |
-| Any platform code | CC-4 Platform Compatibility |
-| Any financial code | CC-5 Financial Precision |
-| Workflow end | CC-6 Knowledge Dual-Write |
+| When | What to Check |
+|------|--------------|
+| Starting work | Load relevant context and knowledge |
+| Design decisions | Align with existing architecture |
+| Data access code | Verify tenant isolation |
+| Platform code | Check platform compatibility |
+| Financial code | Validate precision handling |
+| Finishing work | Update relevant documentation |
 
 Reference: `protocols/cross-cutting-checks.md`
 
 ---
 
-## Fallback Protocol
+## Recovery Strategies
 
-### Same-Workflow Fallback
+### When a Phase Isn't Working
 
-When a phase fails within a workflow:
+A suggested approach when you hit a wall:
 
 ```
-Phase N fails
-  → Diagnose failure (systematic-debugging)
-  → Fix attempt 1 → Re-verify phase N
-  → Fix attempt 2 → Re-verify phase N
-  → Fix attempt 3 → Re-verify phase N
-  → ESCALATE to user
+Phase N isn't working
+  → Diagnose the issue (systematic-debugging skill can help)
+  → Try a fix → Re-verify
+  → If still stuck, step back and reconsider the approach
+  → If fundamentally blocked, bring it to the user
 ```
 
-### Workflow Switch
+Experience shows that after 2-3 failed attempts at the same approach, it's usually better to step back and rethink rather than keep trying the same thing.
 
-Sometimes the right response to a failure is switching to a different workflow:
+### Switching Patterns
 
-| Situation | Switch From | Switch To |
-|-----------|------------|-----------|
-| Build reveals design flaw | WF-2 Module Build | WF-1 Module Design |
-| Bug found during build | WF-2 Module Build | WF-4 Bug Fix → Resume WF-2 |
-| Platform quirk discovered | WF-3 Platform Integration | WF-4 Bug Fix (mini) → Resume WF-3 |
-| Polish reveals missing feature | WF-5 Quality Polish | WF-2 Module Build → Resume WF-5 |
+Sometimes you discover mid-task that you need a different approach:
 
-### Switch Protocol
+| Situation | What to Consider |
+|-----------|-----------------|
+| Build reveals design flaw | Pause build, revisit design |
+| Bug found during build | Fix the bug, then resume building |
+| Platform quirk discovered | Document it, adjust implementation |
+| Polish reveals missing feature | Implement the feature, then resume polish |
 
-1. **Pause** current workflow (save state: which phase, what's done)
-2. **Start** the new workflow (with context from the paused one)
-3. **Complete** the new workflow
-4. **Resume** the original workflow from where it paused
+### Switching Approach
+
+1. **Pause** current work (note where you are and what's done)
+2. **Address** the discovered issue
+3. **Resume** from where you paused
 
 ---
 
-## Escalation Matrix
+## When to Involve the User
 
-### When to Escalate
+Some situations benefit from user input:
 
-| Trigger | Escalation Level |
-|---------|-----------------|
-| 3 fix attempts failed on same issue | Escalate to user |
-| Expert agents disagree on approach | Escalate to user |
-| Security vulnerability discovered | Escalate to user immediately |
-| Design flaw discovered during build | Escalate to user (design authority) |
-| Scope creep detected | Escalate to user |
-| Dependency blocker (external service, API access) | Escalate to user |
+| Situation | Why Involve the User |
+|-----------|---------------------|
+| Repeated failures on the same issue | Fresh perspective often helps |
+| Multiple valid approaches, unclear winner | User has business context you may lack |
+| Security concern discovered | User should be aware immediately |
+| Design flaw during build | User may have design authority |
+| Scope growing beyond original request | User should decide what's in scope |
+| Blocked by external dependency | User may be able to unblock |
 
-### Escalation Package
+### Providing Context When Escalating
 
-Every escalation must include:
+When bringing an issue to the user, it helps to include:
 
-```markdown
-## Escalation: {Brief Description}
-
-### What happened
-{1-2 sentences describing the situation}
-
-### What was tried
-1. Attempt 1: {what} → {result}
-2. Attempt 2: {what} → {result}
-3. Attempt 3: {what} → {result}
-
-### Why it's blocked
-{Root cause analysis — why attempts failed}
-
-### Proposed options
-A. {Option A} — Pros: ... Cons: ...
-B. {Option B} — Pros: ... Cons: ...
-C. {Option C} — Pros: ... Cons: ...
-
-### Recommendation
-{Which option and why}
-```
-
-### User Response Handling
-
-After escalation, the user may:
-
-| User Response | Action |
-|--------------|--------|
-| Selects an option | Implement that option, resume workflow |
-| Provides new information | Incorporate and retry |
-| Changes scope | Adjust plan and resume |
-| Defers decision | Park the workflow, move to next task |
+- What happened (brief)
+- What you've tried
+- Why it's not working
+- Options you see (with tradeoffs)
+- Your recommendation
 
 ---
 
-## Hotfix Workflow (WF-8) Special Rules
+## Hotfix Pattern — Special Considerations
 
-Hotfixes have expedited gates but the same quality bar:
+Hotfixes are about speed without sacrificing correctness:
 
-| Normal Workflow | Hotfix Workflow |
+| Normal Workflow | Hotfix Approach |
 |----------------|-----------------|
 | Full design phase | Skip design — go straight to diagnosis |
 | Full test suite | Targeted tests for the specific fix |
 | Full quality polish | Skip polish — ship the fix |
-| QG-1 through QG-5 | QG-1 + QG-2 + QG-5 (skip QG-3 unless security, skip QG-4) |
+| All quality gates | Focus on compilation, functional verification, and deployment readiness |
 
-**What does NOT change in hotfix:**
+**What stays the same in a hotfix:**
 - Root cause must be located (no blind fixes)
 - Fix must be verified with fresh evidence
 - Tenant isolation must not be compromised
-- Full test suite must pass (even if not all new tests required)
+- Full test suite should still pass
 
 ---
 
-## Workflow Lifecycle Summary
+## Typical Lifecycle
+
+A common flow for a full-featured task:
 
 ```
-1. TRIGGER     — User request arrives
-2. CLASSIFY    — Map to workflow type (WF-1 through WF-8)
-3. LOAD        — CC-1: Load context and knowledge
-4. PLAN        — Identify skill chain, estimate phases
-5. EXECUTE     — Follow skill chain, phase by phase
-6. GATE        — Quality gates at each phase boundary
-7. REWORK      — Fix failures (max 3 per gate)
-8. DELIVER     — CC-6: Dual-write knowledge
-9. VERIFY      — verification-before-completion
-10. COMPLETE   — Archive, update status
+1. UNDERSTAND   — What is the user asking for?
+2. CLASSIFY     — Which pattern fits best?
+3. CONTEXT      — Load relevant knowledge
+4. PLAN         — Identify skill chain, estimate phases
+5. EXECUTE      — Follow skill chain, phase by phase
+6. CHECK        — Quality checks at phase boundaries
+7. FIX          — Address any issues found
+8. VERIFY       — Run verification-before-completion
+9. DELIVER      — Update documentation, hand off
 ```
 
 ---
 
-*Orchestration is not overhead. It's the difference between a well-run factory and a pile of parts.*
+*Good workflow patterns are guardrails, not handcuffs — they keep you on the road while you choose the speed.*

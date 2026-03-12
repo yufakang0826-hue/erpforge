@@ -259,3 +259,17 @@ Key error codes to handle:
 | `EBAY_ES` | Spain | EUR | VAT-inclusive |
 | `EBAY_AU` | Australia | AUD | GST-inclusive |
 | `EBAY_CA` | Canada | CAD | Price-exclusive |
+
+---
+
+## Lessons from Production
+
+- **OAuth tokens expire silently.** eBay sometimes returns HTTP 200 with empty data instead of a clear 401. Your token refresh logic must detect this pattern, not just check status codes.
+
+- **Sandbox ≠ Production.** eBay sandbox API behavior diverges from production in subtle ways (different field names, missing nested objects, different error formats). Never consider a feature "tested" based on sandbox alone.
+
+- **Bulk API operations don't report individual failures clearly.** When a bulk inventory update partially fails, the error response may only mention the first failure. Process items individually for reliable error handling, then optimize with bulk only after individual processing works perfectly.
+
+- **GetItem/GetOrder field names differ between XML and REST APIs.** The Trading API uses `SellingStatus.CurrentPrice` while the Inventory API uses `pricingSummary.price`. Mapping between them is a constant source of bugs.
+
+- **eBay rate limits vary by API and by time of day.** The same call that works fine at 3 AM hits rate limits at 10 AM. Implement exponential backoff with jitter, not fixed retry intervals.

@@ -5,11 +5,15 @@ description: Activates before designing any new ERP module, feature, or business
 
 # ERP Module Design
 
-## <EXTREMELY-IMPORTANT>Iron Law</EXTREMELY-IMPORTANT>
+## Key Principle
 
-**NO CODE SHALL BE WRITTEN UNTIL THE DESIGN IS APPROVED BY THE USER.**
+**Design before code.** Not because rules say so, but because redesigning a database schema after data is in production costs 10x more.
 
 Design is a conversation, not a monologue. Every data model, state machine, and API contract must be explicitly approved before a single line of production code is written. "I think this is right" is not approval.
+
+## Why This Matters for ERP
+
+ERP modules have deep interdependencies — orders depend on products, logistics depends on orders, accounting depends on everything. A poorly designed module boundary causes cascading changes across the system. When you change the order schema after the accounting module already generates journal entries from it, you're not fixing one table — you're rewriting two modules.
 
 ---
 
@@ -44,7 +48,7 @@ The good example is answerable in one word. The bad example requires a whitepape
 
 ## Phase 2: Module Boundary Definition
 
-### HARD-GATE: Module Boundary Check
+### Checkpoint: Module Boundary Check
 
 Before proceeding to data model design, verify:
 
@@ -228,16 +232,16 @@ One paragraph describing what this module does and why.
 
 ---
 
-## Anti-Rationalization Defense
+## ERP Delivery Risks
 
-| Agent Says | Reality | Defense |
-|-----------|---------|---------|
-| "The design is obvious, let me just code it" | No design survives first contact with requirements | HARD-GATE: Design document required |
+| Risk | What Goes Wrong | Prevention |
+|------|----------------|------------|
+| "The design is obvious, let me just code it" | No design survives first contact with requirements | Design document required before code |
 | "I'll figure out the data model as I code" | Schema changes after data exists are painful | Design all tables before writing any code |
 | "This is just a simple CRUD module" | ERP modules are never simple — tenant isolation, audit trails, state machines | Run the full checklist regardless |
 | "The user will probably want X" | Assumptions create rework | Ask, don't assume |
 
-Reference: `skills/anti-rationalization.md` for the complete defense framework.
+Reference: `skills/anti-rationalization.md` for the complete risk catalog.
 
 ---
 

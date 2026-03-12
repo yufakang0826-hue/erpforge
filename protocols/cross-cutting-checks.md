@@ -11,12 +11,14 @@ These 6 checklists apply across all skills and workflows. They are referenced by
 
 | Code | Name | Type | Applies When |
 |------|------|------|-------------|
-| CC-1 | Context Loading | Setup | Every workflow start |
-| CC-2 | Design Alignment | Decision | UI/UX changes |
-| CC-3 | Tenant Isolation | HARD-GATE | Any data access code |
-| CC-4 | Platform Compatibility | Checklist | Platform-related code |
-| CC-5 | Financial Precision | HARD-GATE | Any money/accounting code |
-| CC-6 | Knowledge Dual-Write | Delivery | Every workflow end |
+| CC-1 | Context Loading | Recommended Check | Every workflow start |
+| CC-2 | Design Alignment | Recommended Check | UI/UX changes |
+| CC-3 | Tenant Isolation | Critical Check | Any data access code |
+| CC-4 | Platform Compatibility | Recommended Check | Platform-related code |
+| CC-5 | Financial Precision | Critical Check | Any money/accounting code |
+| CC-6 | Knowledge Dual-Write | Recommended Check | Every workflow end |
+
+CC-3 (Tenant Isolation) and CC-5 (Financial Precision) are non-negotiable — data leaks and money errors are existential risks for an ERP business. Other checks can be adapted to your team's needs.
 
 ---
 
@@ -86,13 +88,13 @@ Default to the HIGHER level. The cost of asking is 30 seconds. The cost of rewor
 
 ---
 
-## CC-3: Tenant Isolation (HARD-GATE)
+## CC-3: Tenant Isolation (Critical Check)
 
 **When:** Any code that reads, writes, updates, or deletes data from the database.
 
-### <EXTREMELY-IMPORTANT>The 6-Item Checklist</EXTREMELY-IMPORTANT>
+### The 6-Item Checklist
 
-Every data-access change MUST verify ALL 6 items:
+Every data-access change must verify ALL 6 items — a single missed tenantId in a JOIN is enough to leak one tenant's data into another's dashboard:
 
 | # | Check | How to Verify |
 |---|-------|--------------|
@@ -122,7 +124,7 @@ WHERE o.tenant_id = $1;
 
 ### Failure Protocol
 
-If ANY item is unchecked → **STOP**. Fix the isolation gap before proceeding. Tenant data leakage is a critical security issue — it is never deferred.
+If any item is unchecked, fix the isolation gap before proceeding. Tenant data leakage is an existential risk — it's the kind of bug that makes customers leave and regulators investigate.
 
 ---
 
@@ -156,11 +158,11 @@ Never assume one platform works like another.
 
 ---
 
-## CC-5: Financial Precision (HARD-GATE)
+## CC-5: Financial Precision (Critical Check)
 
 **When:** Any code that handles money, prices, costs, exchange rates, or accounting entries.
 
-### <EXTREMELY-IMPORTANT>The 5-Item Checklist</EXTREMELY-IMPORTANT>
+### The 5-Item Checklist
 
 | # | Check | What to Verify |
 |---|-------|---------------|
@@ -192,7 +194,7 @@ const total = items.reduce((sum, item) =>
 
 ### Failure Protocol
 
-If ANY item is unchecked → **STOP**. Financial bugs are the most expensive bugs — they affect trust, compliance, and real money.
+If any item is unchecked, fix it before proceeding. Financial bugs are the most expensive bugs — they affect trust, compliance, and real money. A $0.01 rounding error per order compounds to $300/month at scale, and the trust damage with your finance team lasts much longer.
 
 ---
 

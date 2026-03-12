@@ -310,3 +310,13 @@ Common error patterns:
 - `forbidden` — Token expired or insufficient scope
 - `not_found` — Item/order doesn't exist or belongs to different user
 - `validation_error` — Item attributes don't match category requirements
+
+---
+
+## Lessons from Production
+
+- **Official SDK is abandoned.** The MercadoLibre SDK hasn't been updated since 2021. Build your own HTTP client — it's more reliable and you control the retry/timeout behavior.
+
+- **12 site IDs, 12 different behaviors.** MLA (Argentina) and MLB (Brazil) have different category structures, different required attributes (Ficha Tecnica), and different shipping rules. Test with at least 2 sites.
+
+- **Questions API is customer service, not just Q&A.** Buyer questions on MercadoLibre are the primary customer service channel. Route them to your customer service module, not just a "questions" tab.

@@ -5,11 +5,15 @@ description: Activates before implementing any feature, fixing any bug, or writi
 
 # Test-Driven Development
 
-## <EXTREMELY-IMPORTANT>Iron Law</EXTREMELY-IMPORTANT>
+## Key Principle
 
-**NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST. THE TEST DEFINES THE BEHAVIOR. THE CODE MAKES THE TEST PASS. THIS ORDER IS NON-NEGOTIABLE.**
+**No production code without a failing test first.** The test defines the behavior. The code makes the test pass. This order matters.
 
 If you write the code first, the test only proves you can read your own code. If you write the test first, the test proves the code works.
+
+## Why This Matters for ERP
+
+ERP state machines are the #1 source of production bugs. A test that verifies "cancelled orders cannot transition to shipped" is worth more than 100 lines of implementation code. When your order module has 11 states and 15+ transitions, the only way to be confident is to test every legal AND illegal transition explicitly. The processing→cancelled→shipped bug that cost 2 days of production cleanup? A single `it.each` test would have caught it.
 
 ---
 
@@ -228,18 +232,18 @@ describe('Order State Machine', () => {
 
 ---
 
-## Anti-Rationalization Defense
+## ERP Delivery Risks
 
-| # | Agent Says | Reality | Defense |
-|---|-----------|---------|---------|
-| 1 | "Too simple to test" | 30 seconds to write, catches real bugs | Write it. Simple tests have saved production. |
-| 2 | "Tests after code works the same" | Post-hoc tests only prove you can read your code | Pre-written test = spec. Post-written test = rubber stamp. |
-| 3 | "Deleting working code is wasteful" | Sunk cost fallacy. Tests define what "working" means. | If the test says delete it, delete it. |
-| 4 | "Integration test covers it" | Integration tests are slow and don't pinpoint failures | Unit tests catch issues in seconds, not minutes. |
-| 5 | "Mock is too complex" | Test the interface, not the implementation | Simplify the interface, not the test. |
-| 6 | "Will add tests later" | Later never comes. The PR ships without tests. | RED phase is step 1. No exceptions. |
+| # | Risk | What Goes Wrong | Prevention |
+|---|------|----------------|------------|
+| 1 | "Too simple to test" | The "simple" tenant filter that missed a JOIN leaks data | 30 seconds to write a test; catches real bugs |
+| 2 | Tests written after code | Post-hoc tests only prove you can read your own code | Pre-written test = spec. Post-written test = rubber stamp. |
+| 3 | No invalid transition tests | State machine allows cancelled→shipped in edge cases | Test both legal AND illegal transitions explicitly |
+| 4 | Only integration tests | Slow feedback loop; can't pinpoint which module broke | Unit tests catch issues in seconds, not minutes |
+| 5 | No idempotency tests | Retry creates duplicate journal entries; trial balance breaks | Test: run the same operation twice, verify no duplicates |
+| 6 | "Will add tests later" | The PR ships, the bug ships, the 2 AM page ships | RED phase is step 1 |
 
-Reference: `skills/anti-rationalization.md` for the complete defense framework.
+Reference: `skills/anti-rationalization.md` for the complete risk catalog.
 
 ---
 

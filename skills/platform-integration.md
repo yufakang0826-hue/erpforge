@@ -5,11 +5,15 @@ description: Activates when integrating a new e-commerce platform API or extendi
 
 # Platform Integration
 
-## <EXTREMELY-IMPORTANT>Iron Law</EXTREMELY-IMPORTANT>
+## Key Principle
 
-**PLATFORM API DOCUMENTATION IS UNRELIABLE. NEVER WRITE FIELD MAPPING CODE BASED ON DOCUMENTATION ALONE — VERIFY EVERY FIELD NAME WITH A REAL API RESPONSE FIRST.**
+**Platform API documentation is unreliable.** Never write field mapping code based on documentation alone — verify every field name with a real API response first.
 
 Docs say `itemId`. Reality returns `item_id`. One wrong field name = silent data loss in production.
+
+## Why This Matters for ERP
+
+Platform APIs are the most unreliable part of any ERP. Field names in docs don't match reality, sandbox behavior differs from production, and rate limits vary by time of day. The verification steps here prevent the #1 cause of ERP production incidents.
 
 ---
 
@@ -26,10 +30,10 @@ digraph integration_pipeline {
     phase4 [label="Phase 4\nTesting" fillcolor="#fce4ec"]
     phase5 [label="Phase 5\nKnowledge" fillcolor="#f3e5f5"]
 
-    gate1 [label="HARD-GATE\nField names verified\nwith real response?" shape=diamond fillcolor="#ffcdd2"]
-    gate2 [label="HARD-GATE\n5-path test pass?" shape=diamond fillcolor="#ffcdd2"]
-    gate3 [label="HARD-GATE\nBrowser verified?" shape=diamond fillcolor="#ffcdd2"]
-    gate4 [label="HARD-GATE\nAll 5 paths tested?" shape=diamond fillcolor="#ffcdd2"]
+    gate1 [label="Checkpoint\nField names verified\nwith real response?" shape=diamond fillcolor="#ffcdd2"]
+    gate2 [label="Checkpoint\n5-path test pass?" shape=diamond fillcolor="#ffcdd2"]
+    gate3 [label="Checkpoint\nBrowser verified?" shape=diamond fillcolor="#ffcdd2"]
+    gate4 [label="Checkpoint\nAll 5 paths tested?" shape=diamond fillcolor="#ffcdd2"]
 
     phase1 -> gate1
     gate1 -> phase2 [label="Yes"]
@@ -73,7 +77,7 @@ For each API endpoint you need to integrate:
 
 ### 1.3 Field Mapping Verification
 
-**HARD-GATE: Every field name must be verified with a real API response.**
+**Checkpoint: Every field name must be verified with a real API response.**
 
 ```bash
 # GOOD: Verify field names with real request
@@ -266,17 +270,17 @@ After completing integration, update:
 
 ---
 
-## Anti-Rationalization Defense
+## ERP Delivery Risks
 
-| Agent Says | Reality | Defense |
-|-----------|---------|---------|
-| "Verified with real API response" | May have only read docs | HARD-GATE: Must provide curl output (AR-1) |
-| "Documentation says so" | Platform docs are often wrong | Verify with real request first (AR-6) |
-| "Only the happy path matters" | 4 other paths WILL happen in production | All 5 paths tested |
-| "Rate limiting won't happen" | It will. Especially during sync | Test path 4 explicitly |
-| "Error mapping is overkill" | Wrong error codes break frontend auth | 502 for upstream auth errors |
+| Risk | What Goes Wrong | Prevention |
+|------|----------------|------------|
+| Field mapping from docs only | Docs say `itemId`, API returns `item_id` — silent data loss | Must provide curl output with verified field names |
+| Only testing happy path | 4 other paths WILL happen in production | All 5 paths tested |
+| Rate limiting ignored | Sync operations hit rate limits during peak hours | Test path 4 explicitly with backoff |
+| Wrong error code mapping | Upstream 401 passed as 401 triggers frontend auth loop | Map upstream auth errors to 502 |
+| Platform quirks undocumented | Next developer hits the same bug 3 months later | Add to `knowledge/platforms/` immediately |
 
-Reference: `skills/anti-rationalization.md` for the complete defense framework.
+Reference: `skills/anti-rationalization.md` for the complete risk catalog.
 
 ---
 

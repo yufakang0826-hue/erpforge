@@ -118,6 +118,24 @@ curl -fsSL https://raw.githubusercontent.com/yufakang0826-hue/erpforge/main/inst
 curl -fsSL https://raw.githubusercontent.com/yufakang0826-hue/erpforge/main/install/codex.sh | bash
 ```
 
+## A La Carte Usage
+
+ERPForge is modular — use what you need, skip what you don't.
+
+### Just the Knowledge
+Copy `knowledge/` into your project as domain reference. No skills or plugins needed.
+
+### Just the Templates
+Use `scripts/scaffold.sh` to generate modules. Works standalone.
+
+### Individual Skills
+Each skill in `skills/` is a self-contained guide. Read one file, apply one pattern.
+
+### Disable Auto-Activation
+```bash
+export ERPFORGE_MANUAL=1  # Skills won't auto-load; use them on demand
+```
+
 ## How It Works
 
 ```

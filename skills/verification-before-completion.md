@@ -5,11 +5,15 @@ description: Activates when about to claim work is done, a bug is fixed, tests p
 
 # Verification Before Completion
 
-## <EXTREMELY-IMPORTANT>Iron Law</EXTREMELY-IMPORTANT>
+## Key Principle
 
-**NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE. "SHOULD WORK" IS NOT EVIDENCE. "LOOKS GOOD" IS NOT EVIDENCE. ONLY TERMINAL OUTPUT, CURL RESPONSES, AND BROWSER VERIFICATION ARE EVIDENCE.**
+**No completion claims without fresh verification evidence.** "Should work" is not evidence. "Looks good" is not evidence. Only terminal output, curl responses, and browser verification are evidence.
 
 If you can't paste the proof, you can't make the claim.
+
+## Why This Matters for ERP
+
+ERP systems handle real money and real orders. "It probably works" is not acceptable when a bug means shipping the wrong product or double-charging a customer. A verified order export endpoint takes 30 minutes. An unverified one that leaks cross-tenant data takes weeks to clean up — plus the trust damage with affected customers.
 
 ---
 
@@ -184,17 +188,17 @@ NOW I can say: "The order list page is complete. Evidence above."
 
 ---
 
-## Anti-Rationalization Defense
+## ERP Delivery Risks
 
-| Agent Says | Reality | Defense |
-|-----------|---------|---------|
-| "I just verified this" | When? Before or after last change? | Evidence must be FRESH |
-| "tsc passes, it's fine" | Compilation ≠ functionality | Also need curl + browser (AR-2) |
-| "Tests cover this" | Do they? Check test coverage for new code | Show the test output |
-| "Too trivial to verify" | Trivial changes break production | No exceptions to verification |
-| "The user can verify" | Your job to deliver verified work | Verify before presenting |
+| Risk | What Goes Wrong | Prevention |
+|------|----------------|------------|
+| Stale evidence | Verified before last change, not after | Evidence must be FRESH — from current code state |
+| Compilation-only verification | tsc checks types, not business logic | Also need curl + browser verification |
+| Assumed test coverage | New code may not be covered by existing tests | Show the test output for new code paths |
+| "Trivial change" skips verification | Trivial changes cascade in ERP — one field rename breaks sync | No exceptions to verification |
+| Unverified tenant isolation | "Added tenantId" but missed a JOIN or subquery | Complete CC-3 checklist, not a spot check |
 
-Reference: `skills/anti-rationalization.md` for the complete defense framework.
+Reference: `skills/anti-rationalization.md` for the complete risk catalog.
 
 ---
 

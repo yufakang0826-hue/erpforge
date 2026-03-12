@@ -444,3 +444,17 @@ CREATE TABLE accounting_audit_log (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ```
+
+---
+
+## Lessons from Production
+
+- **Idempotency keys prevent double-entries.** During an API timeout and retry, the same order event fires twice. Without an idempotency key (orderId + event + timestamp), you get duplicate journal entries that break trial balance. This happened 3 times before we added the constraint.
+
+- **Don't calculate profit without deducting refunds.** Early dashboards showed inflated profit because refund entries weren't included in the P&L query. The "fix" took 10 minutes; the trust damage with the finance team took weeks to repair.
+
+- **Exchange rate timing matters enormously.** Using today's rate for a transaction that happened 3 months ago creates phantom gains/losses. Pin the exchange rate at transaction time and store it in journal_entry_lines.exchange_rate.
+
+- **Period closing must be irreversible.** If closed periods can be reopened, someone will "fix" historical data and break reconciliation. Use a strict status flow: open → closing → closed, with no backward transitions.
+
+- **Cost of Goods Sold (COGS) is the hardest number.** It's not just purchase price — it includes shipping to warehouse, customs duties, and handling fees. Get the COGS formula right early; changing it later means re-processing every historical order.

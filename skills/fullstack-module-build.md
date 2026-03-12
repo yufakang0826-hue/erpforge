@@ -5,11 +5,15 @@ description: Activates when an approved design exists and implementation begins 
 
 # Fullstack Module Build
 
-## <EXTREMELY-IMPORTANT>Iron Law</EXTREMELY-IMPORTANT>
+## Key Principle
 
-**tsc PASSING ≠ FEATURE WORKING. EVERY PHASE MUST BE VERIFIED WITH REAL EVIDENCE — CURL OUTPUT, BROWSER SCREENSHOTS, TEST RESULTS.**
+**tsc passing does not mean the feature works.** Every phase must be verified with real evidence — curl output, browser screenshots, test results.
 
 Compilation proves syntax. Only real requests prove functionality.
+
+## Why This Matters for ERP
+
+In ERP, a "working" module that lacks tenant isolation or proper error states will fail in production. The phase gates catch these issues before they reach real users. When an order module compiles but allows cross-tenant data access, you don't have a bug — you have a security incident.
 
 ---
 
@@ -27,10 +31,10 @@ digraph build_pipeline {
     phase4 [label="Phase 4\nTesting" fillcolor="#fce4ec"]
     phase5 [label="Phase 5\nDelivery" fillcolor="#f3e5f5"]
 
-    gate1 [label="HARD-GATE\nDesign approved?" shape=diamond fillcolor="#ffcdd2"]
-    gate2 [label="HARD-GATE\ntsc + curl pass?" shape=diamond fillcolor="#ffcdd2"]
-    gate3 [label="HARD-GATE\ntsc + browser pass?" shape=diamond fillcolor="#ffcdd2"]
-    gate4 [label="HARD-GATE\nAll tests pass?" shape=diamond fillcolor="#ffcdd2"]
+    gate1 [label="Checkpoint\nDesign approved?" shape=diamond fillcolor="#ffcdd2"]
+    gate2 [label="Checkpoint\ntsc + curl pass?" shape=diamond fillcolor="#ffcdd2"]
+    gate3 [label="Checkpoint\ntsc + browser pass?" shape=diamond fillcolor="#ffcdd2"]
+    gate4 [label="Checkpoint\nAll tests pass?" shape=diamond fillcolor="#ffcdd2"]
 
     phase1 -> gate1
     gate1 -> phase2 [label="Yes"]
@@ -51,7 +55,7 @@ digraph build_pipeline {
 
 ## Phase 1: Design Confirmation
 
-### HARD-GATE: Design Must Be Approved
+### Checkpoint: Design Approval
 
 Before writing ANY implementation code:
 
@@ -60,7 +64,7 @@ Before writing ANY implementation code:
 - [ ] Data model, state machine, and API contracts are finalized
 - [ ] No open questions remain
 
-**If any item is unchecked → STOP. Go back to design phase.**
+**If any item is unchecked, go back to design phase.**
 
 ---
 
@@ -96,7 +100,7 @@ Schema (Drizzle) → Routes (Express) → Service Layer → Verification
 
 ### 2.4 Backend Verification
 
-**HARD-GATE: All must pass before proceeding to frontend.**
+**Checkpoint: All must pass before proceeding to frontend.**
 
 | Check | Command | Evidence Required |
 |-------|---------|-------------------|
@@ -146,7 +150,7 @@ Page Component → Sub-Components → API Layer → Verification
 
 ### 3.4 Frontend Verification
 
-**HARD-GATE: All must pass before proceeding to testing.**
+**Checkpoint: All must pass before proceeding to testing.**
 
 | Check | Method | Evidence Required |
 |-------|--------|-------------------|
@@ -208,7 +212,7 @@ npm test
 npm test -- --grep "{module}"
 ```
 
-**HARD-GATE: All tests must pass. Zero failures. Zero skipped tests in new code.**
+**Checkpoint: All tests must pass. Zero failures. Zero skipped tests in new code.**
 
 ---
 
@@ -228,7 +232,7 @@ Every module delivery MUST update knowledge files:
 
 ### 5.2 Delivery Checklist
 
-- [ ] All Phase 2-4 HARD-GATEs passed with evidence
+- [ ] All Phase 2-4 Checkpoints passed with evidence
 - [ ] Code reviewed for `as any`, `@ts-ignore`, empty catch blocks
 - [ ] Database migration is reversible
 - [ ] Knowledge files updated (dual-write)
@@ -239,7 +243,7 @@ Every module delivery MUST update knowledge files:
 
 ## Dev-QA Loop
 
-When a HARD-GATE fails:
+When a Checkpoint fails:
 
 ```dot
 digraph dev_qa {
@@ -270,18 +274,18 @@ digraph dev_qa {
 
 ---
 
-## Anti-Rationalization Defense
+## ERP Delivery Risks
 
-| Agent Says | Reality | Defense |
-|-----------|---------|---------|
-| "tsc passes, backend is done" | Compilation ≠ functionality | Must curl every endpoint (AR-2) |
+| Risk | What Goes Wrong | Prevention |
+|------|----------------|------------|
+| "tsc passes, backend is done" | Compilation ≠ functionality | Must curl every endpoint |
 | "Frontend compiles, page works" | Must verify in browser | Screenshot or console evidence |
-| "Too simple to need tests" | Simple code breaks too | Every endpoint: 1 happy + 1 error (AR-3) |
-| "Added tenantId to the query" | May have missed other queries | CC-3 checklist all 6 items (AR-10) |
-| "Will add tests later" | Later never comes | Tests in Phase 4, not Phase 6 (AR-11) |
-| "Not my scope" | Fullstack means fullstack | No blame-shifting (AR-8) |
+| "Too simple to need tests" | Simple code breaks too | Every endpoint: 1 happy + 1 error |
+| "Added tenantId to the query" | May have missed other queries | CC-3 checklist all 6 items |
+| "Will add tests later" | Later never comes | Tests in Phase 4, not Phase 6 |
+| "Not my scope" | Fullstack means fullstack | All layers are your scope |
 
-Reference: `skills/anti-rationalization.md` for the complete defense framework.
+Reference: `skills/anti-rationalization.md` for the complete risk catalog.
 
 ---
 
@@ -293,7 +297,7 @@ Stop and reassess if you catch yourself:
 - [ ] Writing frontend before backend verification passes
 - [ ] Writing tests that only test the happy path
 - [ ] Using `as any` to "fix" a type error
-- [ ] Moving to Phase 5 with any HARD-GATE unchecked
+- [ ] Moving to Phase 5 with any Checkpoint unchecked
 - [ ] Saying "it works" without curl output or screenshot evidence
 - [ ] Testing with only one tenant's data
 
