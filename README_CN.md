@@ -118,6 +118,28 @@ curl -fsSL https://raw.githubusercontent.com/yufakang0826-hue/erpforge/main/inst
 curl -fsSL https://raw.githubusercontent.com/yufakang0826-hue/erpforge/main/install/codex.sh | bash
 ```
 
+## 示例项目
+
+### Mini ERP
+
+一个完整的可运行示例，演示 ERPForge 模式的实际应用：
+
+- 多租户隔离（X-Tenant-ID header + 所有查询带 tenantId）
+- 订单状态机（7 状态 + 转换合法性校验）
+- 库存预扣（reserve → deduct 两阶段扣减）
+- 金额精度（numeric 类型，不用 float）
+- 软删除、Zod 校验、模块边界
+
+```bash
+cd examples/mini-erp
+docker compose up -d postgres
+npm install && npm run db:migrate && npm run db:seed
+npm run dev
+bash test.sh  # 运行端到端测试
+```
+
+详见 [examples/mini-erp/README.md](examples/mini-erp/README.md)。
+
 ## 按需取用
 
 ERPForge 是模块化的——用你需要的，跳过不需要的。

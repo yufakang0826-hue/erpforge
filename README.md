@@ -118,6 +118,28 @@ curl -fsSL https://raw.githubusercontent.com/yufakang0826-hue/erpforge/main/inst
 curl -fsSL https://raw.githubusercontent.com/yufakang0826-hue/erpforge/main/install/codex.sh | bash
 ```
 
+## Examples
+
+### Mini ERP
+
+A complete working example demonstrating ERPForge patterns in action:
+
+- Multi-tenant isolation (X-Tenant-ID header + per-query tenantId filtering)
+- Order state machine (7 states + transition validation)
+- Inventory reservation (reserve → deduct two-phase deduction)
+- Financial precision (numeric type, not float)
+- Soft delete, Zod validation, module boundaries
+
+```bash
+cd examples/mini-erp
+docker compose up -d postgres
+npm install && npm run db:migrate && npm run db:seed
+npm run dev
+bash test.sh  # Run end-to-end tests
+```
+
+See [examples/mini-erp/README.md](examples/mini-erp/README.md) for details.
+
 ## A La Carte Usage
 
 ERPForge is modular — use what you need, skip what you don't.
